@@ -11,7 +11,6 @@
 
   :root {
     --pink: #E6007E;
-    --gold: #D4AF37;
     --dark: #0d0d14;
     --grid-cols: 10;
     --grid-rows: 6;
@@ -46,7 +45,7 @@
     position: relative;
     overflow: hidden;
     opacity: 0;
-    transform: scale(1.2) rotate(2deg);
+    transform: scale(1.2);
     animation: cellReveal 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   }
 
@@ -54,11 +53,11 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: grayscale(80%) brightness(0.5);
+    filter: grayscale(80%) brightness(0.45);
   }
 
   @keyframes cellReveal {
-    to { opacity: 1; transform: scale(1) rotate(0deg); }
+    to { opacity: 1; transform: scale(1); }
   }
 
   /* === Dark overlay === */
@@ -68,14 +67,43 @@
     z-index: 2;
     background: radial-gradient(
       ellipse at center,
-      rgba(13, 13, 20, 0.3) 0%,
-      rgba(13, 13, 20, 0.85) 70%,
+      rgba(13, 13, 20, 0.25) 0%,
+      rgba(13, 13, 20, 0.8) 65%,
       rgba(13, 13, 20, 0.95) 100%
     );
   }
 
-  /* === Big "10" with face-filled text === */
-  .ten-container {
+  /* === Giant "10th" background text === */
+  .big-tenth {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .big-tenth-text {
+    font-size: clamp(200px, 45vw, 550px);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(230, 0, 126, 0.25);
+    opacity: 0;
+    animation: bigTenthIn 2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+    user-select: none;
+  }
+
+  @keyframes bigTenthIn {
+    from { opacity: 0; transform: scale(0.85); filter: blur(20px); }
+    to { opacity: 1; transform: scale(1); filter: blur(0); }
+  }
+
+  /* === "10" with face clipping (canvas-based) === */
+  .ten-canvas-wrap {
     position: absolute;
     inset: 0;
     z-index: 5;
@@ -85,43 +113,16 @@
     pointer-events: none;
   }
 
-  .ten-svg {
-    width: 75vw;
-    max-width: 900px;
-    height: auto;
+  #tenCanvas {
+    max-width: 70vw;
+    max-height: 60vh;
     opacity: 0;
-    animation: tenIn 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+    animation: canvasIn 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
   }
 
-  @keyframes tenIn {
-    from { opacity: 0; transform: scale(0.8); filter: blur(10px); }
+  @keyframes canvasIn {
+    from { opacity: 0; transform: scale(0.9); filter: blur(8px); }
     to { opacity: 1; transform: scale(1); filter: blur(0); }
-  }
-
-  /* === Glow ring around "10" === */
-  .glow-ring {
-    position: absolute;
-    inset: 0;
-    z-index: 4;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-  }
-
-  .glow-ring::before {
-    content: '';
-    width: 50vmin;
-    height: 50vmin;
-    border-radius: 50%;
-    border: 1px solid rgba(230, 0, 126, 0.3);
-    box-shadow: 0 0 60px rgba(230, 0, 126, 0.15), inset 0 0 60px rgba(230, 0, 126, 0.08);
-    opacity: 0;
-    animation: glowIn 2s ease-out 1.2s forwards;
-  }
-
-  @keyframes glowIn {
-    to { opacity: 1; }
   }
 
   /* === Text content === */
@@ -138,26 +139,49 @@
     pointer-events: none;
   }
 
-  .anniversary-label {
-    font-size: clamp(10px, 1.3vw, 14px);
-    font-weight: 500;
-    letter-spacing: 0.5em;
-    text-transform: uppercase;
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 20px;
+    border: 1px solid rgba(230, 0, 126, 0.5);
+    border-radius: 100px;
+    background: rgba(230, 0, 126, 0.08);
+    backdrop-filter: blur(10px);
+    font-size: clamp(10px, 1.2vw, 13px);
+    font-weight: 700;
+    letter-spacing: 0.3em;
     color: var(--pink);
+    text-transform: uppercase;
     opacity: 0;
     transform: translateY(15px);
-    animation: textUp 0.8s ease-out 2.0s forwards;
-    margin-bottom: 12px;
+    animation: textUp 0.8s ease-out 1.8s forwards;
+    margin-bottom: 20px;
+  }
+
+  .badge::before,
+  .badge::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--pink);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
   }
 
   .title-main {
-    font-size: clamp(56px, 12vw, 140px);
+    font-size: clamp(52px, 11vw, 130px);
     font-weight: 900;
     letter-spacing: -0.03em;
     line-height: 0.9;
     opacity: 0;
     transform: translateY(30px);
-    animation: textUp 1s ease-out 2.2s forwards;
+    animation: textUp 1s ease-out 2.0s forwards;
     background: linear-gradient(
       180deg,
       #ffffff 0%,
@@ -169,33 +193,22 @@
     background-clip: text;
   }
 
-  .title-year {
-    font-size: clamp(16px, 2.5vw, 28px);
-    font-weight: 300;
-    letter-spacing: 0.4em;
-    margin-top: 16px;
+  .title-tagline {
+    font-size: clamp(10px, 1.1vw, 14px);
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    margin-top: 20px;
     opacity: 0;
     transform: translateY(20px);
     animation: textUp 0.8s ease-out 2.5s forwards;
-    color: rgba(255, 255, 255, 0.6);
-  }
-
-  .title-tagline {
-    font-size: clamp(11px, 1.2vw, 15px);
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    margin-top: 24px;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: textUp 0.8s ease-out 2.8s forwards;
-    color: rgba(255, 255, 255, 0.45);
+    color: rgba(255, 255, 255, 0.4);
   }
 
   @keyframes textUp {
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* === Confetti / sparkle particles === */
+  /* === Confetti particles === */
   .particles {
     position: absolute;
     inset: 0;
@@ -210,29 +223,18 @@
     animation: sparkle ease-in-out infinite;
   }
 
-  .particle--circle {
-    border-radius: 50%;
-    background: var(--pink);
-  }
-
-  .particle--square {
-    background: var(--gold);
-    transform: rotate(45deg);
-  }
-
-  .particle--line {
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 2px;
-  }
+  .particle--circle { border-radius: 50%; background: var(--pink); }
+  .particle--square { background: #D4AF37; transform: rotate(45deg); }
+  .particle--line { background: rgba(255, 255, 255, 0.5); border-radius: 2px; }
 
   @keyframes sparkle {
     0% { opacity: 0; transform: translateY(0) scale(0) rotate(0deg); }
-    15% { opacity: 0.8; }
-    50% { opacity: 0.6; }
-    100% { opacity: 0; transform: translateY(-60vh) scale(1) rotate(360deg); }
+    15% { opacity: 0.7; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0; transform: translateY(-55vh) scale(1) rotate(360deg); }
   }
 
-  /* === Golden accent lines === */
+  /* === Accent lines === */
   .accent-line {
     position: absolute;
     z-index: 8;
@@ -241,24 +243,35 @@
     opacity: 0;
     animation: lineReveal 1.2s ease-out forwards;
   }
-
-  .accent-line--top {
-    top: 20%;
-    left: 10%;
-    right: 10%;
-    animation-delay: 1.8s;
-  }
-
-  .accent-line--bottom {
-    bottom: 20%;
-    left: 10%;
-    right: 10%;
-    animation-delay: 2.0s;
-  }
+  .accent-line--top { top: 18%; left: 8%; right: 8%; animation-delay: 1.6s; }
+  .accent-line--bottom { bottom: 18%; left: 8%; right: 8%; animation-delay: 1.8s; }
 
   @keyframes lineReveal {
     from { opacity: 0; transform: scaleX(0); }
-    to { opacity: 0.4; transform: scaleX(1); }
+    to { opacity: 0.35; transform: scaleX(1); }
+  }
+
+  /* === Shimmer === */
+  .shimmer {
+    position: absolute;
+    inset: 0;
+    z-index: 7;
+    background: linear-gradient(
+      105deg,
+      transparent 0%, transparent 40%,
+      rgba(230, 0, 126, 0.1) 45%,
+      rgba(230, 0, 126, 0.18) 50%,
+      rgba(230, 0, 126, 0.1) 55%,
+      transparent 60%, transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmerMove 4s ease-in-out 2.5s infinite;
+    pointer-events: none;
+  }
+
+  @keyframes shimmerMove {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
 
   /* === Scroll hint === */
@@ -295,31 +308,6 @@
     0%, 100% { opacity: 0.2; transform: scaleY(0.5); }
     50% { opacity: 0.8; transform: scaleY(1); }
   }
-
-  /* === Animated shimmer across faces === */
-  .shimmer {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    background: linear-gradient(
-      105deg,
-      transparent 0%,
-      transparent 40%,
-      rgba(230, 0, 126, 0.12) 45%,
-      rgba(230, 0, 126, 0.2) 50%,
-      rgba(230, 0, 126, 0.12) 55%,
-      transparent 60%,
-      transparent 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmerMove 4s ease-in-out 2s infinite;
-    pointer-events: none;
-  }
-
-  @keyframes shimmerMove {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
 </style>
 </head>
 <body>
@@ -330,47 +318,14 @@
   <!-- Dark vignette overlay -->
   <div class="overlay"></div>
 
-  <!-- Shimmer effect -->
-  <div class="shimmer"></div>
+  <!-- Giant "10th" outline text behind everything -->
+  <div class="big-tenth">
+    <span class="big-tenth-text">10th</span>
+  </div>
 
-  <!-- Glow ring -->
-  <div class="glow-ring"></div>
-
-  <!-- Big "10" with face grid clipped inside -->
-  <div class="ten-container">
-    <svg class="ten-svg" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <clipPath id="tenClip">
-          <!-- "1" -->
-          <path d="M60 20 L120 20 L120 280 L60 280 Z"/>
-          <!-- "0" -->
-          <ellipse cx="340" cy="150" rx="160" ry="130"/>
-        </clipPath>
-        <clipPath id="tenInnerClip">
-          <!-- Inner cutout for "0" -->
-          <rect x="0" y="0" width="600" height="300"/>
-        </clipPath>
-        <!-- Face grid pattern inside the 10 -->
-        <pattern id="facePattern" x="0" y="0" width="120" height="100" patternUnits="userSpaceOnUse">
-          <image id="patImg0" x="0" y="0" width="60" height="50" preserveAspectRatio="xMidYMid slice"/>
-          <image id="patImg1" x="60" y="0" width="60" height="50" preserveAspectRatio="xMidYMid slice"/>
-          <image id="patImg2" x="0" y="50" width="60" height="50" preserveAspectRatio="xMidYMid slice"/>
-          <image id="patImg3" x="60" y="50" width="60" height="50" preserveAspectRatio="xMidYMid slice"/>
-        </pattern>
-      </defs>
-      <!-- "1" shape filled with faces -->
-      <g>
-        <path d="M30 20 L110 20 L110 280 L80 280 L80 60 L30 75 Z" fill="url(#facePattern)" opacity="0.9"/>
-        <path d="M30 20 L110 20 L110 280 L80 280 L80 60 L30 75 Z" fill="none" stroke="rgba(230,0,126,0.5)" stroke-width="1.5"/>
-      </g>
-      <!-- "0" shape filled with faces -->
-      <g>
-        <ellipse cx="360" cy="150" rx="155" ry="128" fill="url(#facePattern)" opacity="0.9"/>
-        <ellipse cx="360" cy="150" rx="90" ry="75" fill="#0d0d14"/>
-        <ellipse cx="360" cy="150" rx="155" ry="128" fill="none" stroke="rgba(230,0,126,0.5)" stroke-width="1.5"/>
-        <ellipse cx="360" cy="150" rx="90" ry="75" fill="none" stroke="rgba(230,0,126,0.3)" stroke-width="1"/>
-      </g>
-    </svg>
+  <!-- "10" with faces clipped inside (canvas) -->
+  <div class="ten-canvas-wrap">
+    <canvas id="tenCanvas" width="800" height="400"></canvas>
   </div>
 
   <!-- Accent lines -->
@@ -379,11 +334,13 @@
 
   <!-- Text content -->
   <div class="content">
-    <p class="anniversary-label">10th Anniversary</p>
+    <div class="badge">10th Anniversary</div>
     <h1 class="title-main">Designship</h1>
-    <p class="title-year">2025.10.11 &mdash; 10.12</p>
     <p class="title-tagline">TOKYO MIDTOWN HALL & CONFERENCE</p>
   </div>
+
+  <!-- Shimmer -->
+  <div class="shimmer"></div>
 
   <!-- Sparkle particles -->
   <div class="particles" id="particles"></div>
@@ -416,17 +373,13 @@
 
   // Background face grid (10x6 = 60 cells)
   const gridEl = document.getElementById('faceGrid');
-  const totalCells = 60;
-  for (let i = 0; i < totalCells; i++) {
+  for (let i = 0; i < 60; i++) {
     const cell = document.createElement('div');
     cell.className = 'face-cell';
-    // Spiral-out reveal from center
     const row = Math.floor(i / 10);
     const col = i % 10;
-    const cx = Math.abs(col - 4.5);
-    const cy = Math.abs(row - 2.5);
-    const dist = Math.sqrt(cx * cx + cy * cy);
-    cell.style.animationDelay = `${0.1 + dist * 0.12}s`;
+    const dist = Math.sqrt(Math.pow(col - 4.5, 2) + Math.pow(row - 2.5, 2));
+    cell.style.animationDelay = `${0.1 + dist * 0.1}s`;
     const img = document.createElement('img');
     img.src = speakerImages[i % speakerImages.length];
     img.alt = '';
@@ -435,17 +388,71 @@
     gridEl.appendChild(cell);
   }
 
-  // Set SVG pattern images
+  // Draw "10" on canvas with face images clipped inside
+  const canvas = document.getElementById('tenCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = 800, H = 400;
+
+  // Load all images first, then draw
+  const imgs = [];
+  let loaded = 0;
   const shuffled = shuffle(speakerImages);
-  for (let i = 0; i < 4; i++) {
-    const el = document.getElementById('patImg' + i);
-    if (el) el.setAttribute('href', shuffled[i % shuffled.length]);
+
+  shuffled.forEach((src, i) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      loaded++;
+      if (loaded === shuffled.length) drawTen();
+    };
+    img.onerror = () => {
+      loaded++;
+      if (loaded === shuffled.length) drawTen();
+    };
+    img.src = src;
+    imgs.push(img);
+  });
+
+  function drawTen() {
+    // Draw face mosaic on full canvas
+    const cols = 8, rows = 4;
+    const cw = W / cols, ch = H / rows;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const img = imgs[(r * cols + c) % imgs.length];
+        if (img.complete && img.naturalWidth > 0) {
+          ctx.drawImage(img, c * cw, r * ch, cw, ch);
+        }
+      }
+    }
+
+    // Use composite to clip to "10" text shape
+    ctx.globalCompositeOperation = 'destination-in';
+    ctx.font = '900 340px Montserrat, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#fff';
+    ctx.fillText('10', W / 2, H / 2 + 10);
+
+    // Add pink tint overlay
+    ctx.globalCompositeOperation = 'source-atop';
+    ctx.fillStyle = 'rgba(230, 0, 126, 0.15)';
+    ctx.fillRect(0, 0, W, H);
+
+    // Add stroke outline
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.font = '900 340px Montserrat, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = 'rgba(230, 0, 126, 0.5)';
+    ctx.lineWidth = 2;
+    ctx.strokeText('10', W / 2, H / 2 + 10);
   }
 
-  // Generate sparkle particles (celebratory feel)
+  // Sparkle particles
   const particlesEl = document.getElementById('particles');
   const shapes = ['circle', 'square', 'line'];
-  for (let i = 0; i < 35; i++) {
+  for (let i = 0; i < 30; i++) {
     const p = document.createElement('div');
     const shape = shapes[i % 3];
     p.className = `particle particle--${shape}`;
@@ -453,7 +460,6 @@
     p.style.top = (60 + Math.random() * 40) + '%';
     p.style.animationDuration = (3 + Math.random() * 5) + 's';
     p.style.animationDelay = (Math.random() * 6) + 's';
-
     if (shape === 'line') {
       p.style.width = (12 + Math.random() * 20) + 'px';
       p.style.height = '2px';
