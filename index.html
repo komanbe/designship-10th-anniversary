@@ -45,8 +45,8 @@
     position: relative;
     overflow: hidden;
     opacity: 0;
-    transform: scale(1.2);
-    animation: cellReveal 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    transform: scale(0) rotate(8deg);
+    animation: cellReveal 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
 
   .face-cell img {
@@ -57,7 +57,9 @@
   }
 
   @keyframes cellReveal {
-    to { opacity: 1; transform: scale(1); }
+    0% { opacity: 0; transform: scale(0) rotate(8deg); }
+    60% { opacity: 1; transform: scale(1.08) rotate(-1deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
   }
 
   /* === Dark overlay === */
@@ -371,15 +373,24 @@
     return a;
   }
 
-  // Background face grid (10x6 = 60 cells)
+  // Background face grid (10x6 = 60 cells) with random staggered reveal
   const gridEl = document.getElementById('faceGrid');
-  for (let i = 0; i < 60; i++) {
+  const totalCells = 60;
+  // Create random reveal order
+  const revealOrder = Array.from({length: totalCells}, (_, i) => i);
+  for (let i = revealOrder.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [revealOrder[i], revealOrder[j]] = [revealOrder[j], revealOrder[i]];
+  }
+  const delayMap = new Map();
+  revealOrder.forEach((cellIdx, order) => {
+    delayMap.set(cellIdx, 0.2 + order * 0.06);
+  });
+
+  for (let i = 0; i < totalCells; i++) {
     const cell = document.createElement('div');
     cell.className = 'face-cell';
-    const row = Math.floor(i / 10);
-    const col = i % 10;
-    const dist = Math.sqrt(Math.pow(col - 4.5, 2) + Math.pow(row - 2.5, 2));
-    cell.style.animationDelay = `${0.1 + dist * 0.1}s`;
+    cell.style.animationDelay = `${delayMap.get(i)}s`;
     const img = document.createElement('img');
     img.src = speakerImages[i % speakerImages.length];
     img.alt = '';
